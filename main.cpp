@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 #include <vector>
 #include <string>
@@ -46,6 +45,10 @@ public:
     long double getZ() const
     {
         return z;
+    }
+    string getName()
+    {
+        return name;
     }
     friend class Spaceship;
 };
@@ -121,8 +124,12 @@ class Spaceship
 public:
     friend long double calculateDistance(const CelestialBody &body1, const CelestialBody &body2);
 
-    Spaceship(int _fuel, const CelestialBody &_currentPlanet, long double _speed)
-        : fuel(_fuel), currentPlanet(_currentPlanet), speed(_speed) {}
+    void setSpaceship(int _fuel, const CelestialBody &_currentPlanet, long double _speed)
+    {
+        fuel = _fuel;
+        currentPlanet = _currentPlanet;
+        speed = _speed;
+    }
 
     int getFuel() const
     {
@@ -143,55 +150,103 @@ public:
 
         fuel -= fuelRequired;
         currentPlanet = destinationPlanet;
-        cout << "Arrived at " << currentPlanet.name << ". Fuel remaining: " << fuel << endl;
-        cout << "Time taken to travel: " << timeTaken << " hours" << endl;
+        cout << "Arrived at " << currentPlanet.name << ". \nFuel remaining             : " << fuel << endl;
+        cout << "Time taken to travel       : " << timeTaken << " hours" << endl;
+        cout << "-------------------------------------------------------------\n";
+    }
+
+    void displayInfo(CelestialBody ob)
+    {
+        cout << "-------------------------------------------------------------\n";
+        cout << "Current Planet       : " << currentPlanet.getName() << endl;
+        cout << "Fuel                 : " << fuel << endl;
+        travelTo(ob);
     }
 };
 
+CelestialBody getCelestialBody(string str, vector<Star> s, vector<Moon> m, vector<Planet> p, int &flag)
+{
+    flag = 0;
+    CelestialBody celestialBody;
+    for (Star &obj : s)
+    {
+        if (!str.compare(obj.getName()))
+        {
+            flag = 1;
+            celestialBody = obj;
+            break;
+        }
+    }
+    if (!flag)
+    {
+        for (Moon &obj : m)
+        {
+            if (!str.compare(obj.getName()))
+            {
+                flag = 1;
+                celestialBody = obj;
+                break;
+            }
+        }
+    }
+    if (!flag)
+    {
+        for (Planet &obj : p)
+        {
+            if (!str.compare(obj.getName()))
+            {
+                flag = 1;
+                celestialBody = obj;
+                break;
+            }
+        }
+    }
+    return celestialBody;
+}
 int main()
 {
-    fstream f;
+    vector<Star> s;
     Star s1, s2, s3, s4, s5;
     s1.setStar("Sun", 1.989e30, 696340, 0, 0, 0, "G-type main-sequence star");
     s2.setStar("Sirius", 2.063e30, 1.711e6, 8.6, 0, 0, "A-type main-sequence star");
     s3.setStar("Betelgeuse", 7.7e31, 9.04e5, 0, 0, 643, "Red supergiant");
     s4.setStar("Vega", 2.1e30, 2.17e6, -7.6, 0, 0, "A-type main-sequence star");
     s5.setStar("Rigel", 2.5e31, 7.6e5, 0, 0, -860, "Blue supergiant");
-    f.open("star.txt", ios::out | ios::binary);
-    f.write((char *)&s1, sizeof(s1));
-    f.write((char *)&s2, sizeof(s2));
-    f.write((char *)&s3, sizeof(s3));
-    f.write((char *)&s4, sizeof(s4));
-    f.write((char *)&s5, sizeof(s5));
-    f.close();
+    s.push_back(s1);
+    s.push_back(s2);
+    s.push_back(s3);
+    s.push_back(s4);
+    s.push_back(s5);
+
+    vector<Moon> m;
     Moon m1, m2, m3, m4, m5;
     m1.setMoon("Luna", 7.35e22, 1737.5, 0, 0, 0, "Earth");
     m2.setMoon("Phobos", 1.08e16, 11.2667, 0, 0, 0, "Mars");
     m3.setMoon("Io", 8.9319e22, 1821.6, 0, 0, 0, "Jupiter");
     m4.setMoon("Europa", 4.8e22, 1560.8, 0, 0, 0, "Jupiter");
-    m5.setMoon("Titan", 1.3452e23, 2575, 0, 0, 0, "Saturn");
-    f.open("moon.txt", ios::out | ios::binary);
-    f.write((char *)&m1, sizeof(m1));
-    f.write((char *)&m2, sizeof(m2));
-    f.write((char *)&m3, sizeof(m3));
-    f.write((char *)&m4, sizeof(m4));
-    f.write((char *)&m5, sizeof(m5));
-    f.close();
+    m5.setMoon("Titan", 1.3452e23, 2575, 10, 10, 0, "Saturn");
+    m.push_back(m1);
+    m.push_back(m2);
+    m.push_back(m3);
+    m.push_back(m4);
+    m.push_back(m5);
+
+    vector<Planet> p;
     Planet p1, p2, p3, p4, p5;
     p1.setPlanet("Mercury", 3.285e23, 2439.7, 0, 0, 0, 0.39);
     p2.setPlanet("Venus", 4.867e24, 6051.8, 0, 0, 0, 0.72);
-    p3.setPlanet("Earth", 5.972e24, 6371, 0, 0, 0, 1);
+    p3.setPlanet("Earth", 5.972e24, 6371, 5, 10, 9, 1);
     p4.setPlanet("Mars", 6.39e23, 3389.5, 0, 0, 0, 1.52);
     p5.setPlanet("Jupiter", 1.898e27, 69911, 0, 0, 0, 5.2);
-    f.open("planet.txt", ios::out | ios::binary);
-    f.write((char *)&p1, sizeof(p1));
-    f.write((char *)&p2, sizeof(p2));
-    f.write((char *)&p3, sizeof(p3));
-    f.write((char *)&p4, sizeof(p4));
-    f.write((char *)&p5, sizeof(p5));
-    f.close();
+    p.push_back(p1);
+    p.push_back(p2);
+    p.push_back(p3);
+    p.push_back(p4);
+    p.push_back(p5);
+
+    Spaceship sp;
     int ch;
-    do
+    while (1)
     {
         cout << "-------------------------------------------------------------\n";
         cout << "|" << setw(10) << "NO    |"
@@ -219,44 +274,236 @@ int main()
              << "|" << setw(50) << "Calculate Distance Between Two Celestial Body |\n";
         cout << "|" << setw(10) << "11     |"
              << "|" << setw(50) << "SpaceShip's fuel Details                      |\n";
+        cout << "|" << setw(10) << "12     |"
+             << "|" << setw(50) << "Exit                                          |\n";
         cout << "-------------------------------------------------------------\n";
         cout << "Enter your Choice : ";
         cin >> ch;
-        Star s;
-        Planet p;
-        Moon m;
-        switch (ch)
+        if (ch >= 1 && ch <= 12)
         {
-        case 1:
-            f.open("star.txt", ios::in | ios::binary);
-            while (f.read((char *)(&s), sizeof(s)))
+            string star, moon, planet, name, type, orbitingPlanet, celestialBody1, celestialBody2;
+            long double mass, radius, x, y, z, distanceFromStar, speed;
+            int fuel;
+            Star obS;
+            Planet obP;
+            Moon obM;
+            CelestialBody c1, c2;
+            int flag;
+            switch (ch)
             {
-                s.displayInfo();
-                cout << "-------------------------------------------------------------\n";
-            }
-            f.close();
+            case 1:
+                for (Star &obj : s)
+                {
+                    obj.displayInfo();
+                    cout << "-------------------------------------------------------------\n";
+                }
+                break;
+            case 2:
+                for (Moon &obj : m)
+                {
+                    obj.displayInfo();
+                    cout << "-------------------------------------------------------------\n";
+                }
+                break;
 
-            break;
-        case 2:
-            f.open("moon.txt", ios::in | ios::binary);
-            while (f.read((char *)&m, sizeof(m)))
-            {
-                m.displayInfo();
-                cout << "-------------------------------------------------------------\n";
-            }
-            f.close();
-            break;
+            case 3:
+                for (Planet &obj : p)
+                {
+                    obj.displayInfo();
+                    cout << "-------------------------------------------------------------\n";
+                }
+                break;
 
-        case 3:
-            f.open("planet.txt", ios::in | ios::binary);
-            while (f.read((char *)&p, sizeof(p)))
-            {
-                p.displayInfo();
+            case 4:
+                cout << "Enter Star's Name : ";
+                flag = 0;
+                cin >> star;
+                for (Star &obj : s)
+                {
+                    if (!star.compare(obj.getName()))
+                    {
+                        flag = 1;
+                        obj.displayInfo();
+                        cout << "-------------------------------------------------------------\n";
+                        break;
+                    }
+                }
+                if (!flag)
+                {
+                    cout << "Not Found!\n";
+                }
+                break;
+
+            case 5:
+                cout << "Enter Moon's Name : ";
+                flag = 0;
+                cin >> moon;
+                for (Moon &obj : m)
+                {
+                    if (!moon.compare(obj.getName()))
+                    {
+                        flag = 1;
+                        obj.displayInfo();
+                        cout << "-------------------------------------------------------------\n";
+                        break;
+                    }
+                }
+                if (!flag)
+                {
+                    cout << "Not Found!\n";
+                }
+                break;
+
+            case 6:
+                cout << "Enter Planet's Name : ";
+                flag = 0;
+                cin >> planet;
+                for (Planet &obj : p)
+                {
+                    if (!planet.compare(obj.getName()))
+                    {
+                        flag = 1;
+                        obj.displayInfo();
+                        cout << "-------------------------------------------------------------\n";
+                        break;
+                    }
+                }
+                if (!flag)
+                {
+                    cout << "Not Found!\n";
+                }
+                break;
+
+            case 7:
                 cout << "-------------------------------------------------------------\n";
+                cout << "Enter Star's Information\n";
+                cout << "-------------------------------------------------------------\n";
+                cout << "Name                 : ";
+                cin >> name;
+                cout << "Mass                 : ";
+                cin >> mass;
+                cout << "Radius               : ";
+                cin >> radius;
+                cout << "Coordinates(x,y,z)   : ";
+                cin >> x >> y >> z;
+                cout << "Type                 : ";
+                cin >> type;
+                cout << "-------------------------------------------------------------\n";
+                obS.setStar(name, mass, radius, x, y, z, type);
+                s.push_back(obS);
+                cout << "Added Successfully!\n";
+                break;
+
+            case 8:
+                cout << "-------------------------------------------------------------\n";
+                cout << "Enter Moon's Information\n";
+                cout << "-------------------------------------------------------------\n";
+                cout << "Name                 : ";
+                cin >> name;
+                cout << "Mass                 : ";
+                cin >> mass;
+                cout << "Radius               : ";
+                cin >> radius;
+                cout << "Coordinates(x,y,z)   : ";
+                cin >> x >> y >> z;
+                cout << "Orbiting Planet      : ";
+                cin >> orbitingPlanet;
+                cout << "-------------------------------------------------------------\n";
+                obM.setMoon(name, mass, radius, x, y, z, orbitingPlanet);
+                m.push_back(obM);
+                cout << "Added Successfully!\n";
+                break;
+
+            case 9:
+                cout << "-------------------------------------------------------------\n";
+                cout << "Enter Planet's Information\n";
+                cout << "-------------------------------------------------------------\n";
+                cout << "Name                 : ";
+                cin >> name;
+                cout << "Mass                 : ";
+                cin >> mass;
+                cout << "Radius               : ";
+                cin >> radius;
+                cout << "Coordinates(x,y,z)   : ";
+                cin >> x >> y >> z;
+                cout << "Distance From Star   : ";
+                cin >> distanceFromStar;
+                cout << "-------------------------------------------------------------\n";
+                obP.setPlanet(name, mass, radius, x, y, z, distanceFromStar);
+                p.push_back(obP);
+                cout << "Added Successfully!\n";
+                break;
+
+            case 10:
+                cout << "-------------------------------------------------------------\n";
+                cout << "Enter first Celestial Body             : ";
+                cin >> celestialBody1;
+                cout << "Enter Second Celestial Body            : ";
+                cin >> celestialBody2;
+                cout << "-------------------------------------------------------------\n";
+                c1 = getCelestialBody(celestialBody1, s, m, p, flag);
+                c2 = getCelestialBody(celestialBody2, s, m, p, flag);
+                if (!flag)
+                {
+                    cout << "Entered Celestial Body is not found!\n";
+                }
+                else
+                {
+                    cout << "Distance between " << celestialBody1 << " and " << celestialBody2 << "       : " << calculateDistance(c1, c2) << " Km" << endl;
+                    cout << "-------------------------------------------------------------\n";
+                }
+                break;
+
+            case 11:
+                cout << "-------------------------------------------------------------\n";
+                cout << "Enter Spaceship's Information\n";
+                cout << "Fuel                       : ";
+                cin >> fuel;
+                cout << "Current Planet Name        : ";
+                cin >> celestialBody1;
+                cout << "Destination Planet Name    : ";
+                cin >> celestialBody2;
+                cout << "Speed                      : ";
+                cin >> speed;
+                cout << "-------------------------------------------------------------\n";
+                flag = 0;
+                for (Planet &obj : p)
+                {
+                    if (!celestialBody1.compare(obj.getName()))
+                    {
+                        flag = 1;
+                        c1 = obj;
+                        break;
+                    }
+                }
+                for (Planet &obj : p)
+                {
+                    if (!celestialBody2.compare(obj.getName()))
+                    {
+                        flag = 1;
+                        c2 = obj;
+                        break;
+                    }
+                }
+                if (!flag)
+                {
+                    cout << "Entered Celestial Body is not found!\n";
+                }
+                else
+                {
+                    sp.setSpaceship(fuel, c1, speed);
+                    sp.displayInfo(c2);
+                }
+                break;
             }
-            f.close();
+        }
+        else if (ch == 12)
+        {
             break;
         }
-
-    } while (ch < 12);
+        else
+        {
+            cout << "Enter valid choice!\n";
+        }
+    }
 }
